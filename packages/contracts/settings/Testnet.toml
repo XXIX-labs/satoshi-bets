@@ -1,0 +1,7 @@
+[network]
+name = "testnet"
+stacks-node = "https://api.testnet.hiro.so"
+
+[accounts.deployer]
+# Set DEPLOYER_MNEMONIC environment variable or paste mnemonic here (DO NOT COMMIT)
+mnemonic = ""

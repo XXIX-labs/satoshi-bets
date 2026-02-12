@@ -1,0 +1,29 @@
+[project]
+name = "satoshi-bets"
+description = "AI-native prediction markets on Bitcoin via Stacks L2"
+authors = ["Satoshi Bets — XXIX Labs"]
+telemetry = false
+cache_dir = ".clarinet"
+
+[contracts.sip010-ft-trait]
+path = "contracts/sip010-ft-trait.clar"
+clarity_version = 2
+epoch = "2.5"
+
+[contracts.market-factory]
+path = "contracts/market-factory.clar"
+clarity_version = 3
+epoch = "3.0"
+
+[contracts.oracle-registry]
+path = "contracts/oracle-registry.clar"
+clarity_version = 3
+epoch = "3.0"
+
+[contracts.market-amm]
+path = "contracts/market-amm.clar"
+clarity_version = 3
+epoch = "3.0"
+
+[repl.settings]
+show_costs = false
