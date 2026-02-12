@@ -1,0 +1,23 @@
+{
+  "name": "satoshi-bets",
+  "version": "0.1.0",
+  "private": true,
+  "description": "AI-native prediction market on Bitcoin via Stacks L2",
+  "scripts": {
+    "dev": "turbo dev",
+    "build": "turbo build",
+    "test": "turbo test",
+    "lint": "turbo lint",
+    "typecheck": "turbo typecheck",
+    "clean": "turbo clean"
+  },
+  "devDependencies": {
+    "turbo": "^2.3.3",
+    "typescript": "^5.7.0"
+  },
+  "engines": {
+    "node": ">=20.0.0",
+    "pnpm": ">=9.0.0"
+  },
+  "packageManager": "pnpm@10.23.0"
+}
