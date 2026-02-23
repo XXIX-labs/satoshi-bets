@@ -1,0 +1,120 @@
+name: CI
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main]
+
+env:
+  NODE_VERSION: '22'
+
+jobs:
+  # ─────────────────────────────────────────────────
+  # Smart Contract Tests
+  # ─────────────────────────────────────────────────
+  contracts:
+    name: Clarity Contracts
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 9
+
+      - name: Install Clarinet
+        run: |
+          curl -L https://github.com/hirosystems/clarinet/releases/download/v2.13.0/clarinet-linux-x64-glibc.tar.gz | tar xz
+          sudo mv clarinet /usr/local/bin/
+          clarinet --version
+
+      - name: Install dependencies
+        working-directory: packages/contracts
+        run: pnpm install --frozen-lockfile
+
+      - name: Check contracts
+        working-directory: packages/contracts
+        run: clarinet check
+
+      - name: Run contract tests
+        working-directory: packages/contracts
+        run: pnpm test --run
+
+  # ─────────────────────────────────────────────────
+  # Backend Build & Lint
+  # ─────────────────────────────────────────────────
+  backend:
+    name: Backend
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 9
+
+      - name: Install dependencies
+        working-directory: packages/backend
+        run: pnpm install --frozen-lockfile
+
+      - name: Type check
+        working-directory: packages/backend
+        run: pnpm exec tsc --noEmit
+
+      - name: Build
+        working-directory: packages/backend
+        run: pnpm build
+
+  # ─────────────────────────────────────────────────
+  # Frontend Build & Type-check
+  # ─────────────────────────────────────────────────
+  frontend:
+    name: Frontend
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 9
+
+      - name: Install dependencies
+        working-directory: packages/frontend
+        run: pnpm install --frozen-lockfile
+
+      - name: Type check
+        working-directory: packages/frontend
+        run: pnpm exec tsc --noEmit
+
+      - name: Build
+        working-directory: packages/frontend
+        env:
+          VITE_API_URL: https://api.satoshibets.xyz/api/v1
+          VITE_STACKS_NETWORK: testnet
+          VITE_MARKET_FACTORY_ADDRESS: ST000000000000000000002AMW42H
+          VITE_MARKET_FACTORY_NAME: market-factory
+          VITE_MARKET_AMM_ADDRESS: ST000000000000000000002AMW42H
+          VITE_MARKET_AMM_NAME: market-amm
+          VITE_ORACLE_REGISTRY_ADDRESS: ST000000000000000000002AMW42H
+          VITE_ORACLE_REGISTRY_NAME: oracle-registry
+          VITE_SBTC_CONTRACT: ST000000000000000000002AMW42H.sbtc-token
+        run: pnpm build
