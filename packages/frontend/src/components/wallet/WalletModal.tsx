@@ -27,7 +27,7 @@ export function WalletModal() {
         {WALLETS.map((wallet) => (
           <button
             key={wallet.id}
-            onClick={() => connect()}
+            onClick={() => connect(wallet.id as 'leather' | 'xverse')}
             disabled={isConnecting}
             className="row-item w-full flex items-center gap-4 rounded-md border border-border bg-s0 p-4 text-left transition-all hover:border-border-active hover:bg-s1 disabled:opacity-40"
           >

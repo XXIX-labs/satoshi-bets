@@ -28,9 +28,13 @@ export function truncateAddress(address: string, chars = 6): string {
 }
 
 /** Format block height as approximate date */
-export function blockToDate(blockHeight: number, currentBlock: number): string {
+export function blockToDate(blockHeight: number, currentBlock = 0): string {
+  if (currentBlock === 0) {
+    const date = new Date(Date.now() + blockHeight * 600 * 1000)
+    return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })
+  }
   const blocksRemaining = blockHeight - currentBlock
-  const secondsRemaining = blocksRemaining * 600 // ~10 min per block
+  const secondsRemaining = blocksRemaining * 600
   const date = new Date(Date.now() + secondsRemaining * 1000)
   return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
 }

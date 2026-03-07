@@ -2,7 +2,7 @@
 ;; Constant Product Market Maker (x * y = k) for prediction market shares
 ;; Price of YES = No_pool / (Yes_pool + No_pool)
 ;; Price of NO  = Yes_pool / (Yes_pool + No_pool)
-;; Satoshi Bets — XXIX Labs 2026
+;; Satoshi Bets - XXIX Labs 2026
 
 (use-trait sip010-trait .sip010-ft-trait.sip010-ft-trait)
 
@@ -29,7 +29,7 @@
 (define-constant SELL-FEE-BPS u100)    ;; 1% fee on sells
 (define-constant CLAIM-FEE-BPS u100)   ;; 1% fee on winning claims
 
-;; 6-decimal precision for price representation (0–1,000,000 = 0–1.0)
+;; 6-decimal precision for price representation (0-1,000,000 = 0-1.0)
 (define-constant PRECISION u1000000)
 ;; Minimum pool size: 0.01 sBTC to prevent division by zero
 (define-constant MIN-POOL-SIZE u1000000)

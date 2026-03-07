@@ -84,3 +84,22 @@ export interface PortfolioData {
   positions: MarketPosition[]
   summary: PortfolioSummary
 }
+
+export interface Analytics {
+  totalMarkets: number
+  activeMarkets: number
+  resolvedMarkets: number
+  totalVolume: number
+  totalFees: number
+  uniqueTraders: number
+  aiMarketsCreated: number
+  oracleResolutions: number
+}
+
+export interface OracleQueueItem {
+  market: Market
+  status: 'pending' | 'submitted' | 'disputed' | 'finalized'
+  confidence?: number
+  outcome?: boolean
+  reasoning?: string
+}

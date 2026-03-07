@@ -5,12 +5,14 @@ import { MarketFilters } from '../../components/markets/MarketFilters.js'
 import { Spinner } from '../../components/ui/Spinner.js'
 import { Skeleton } from '../../components/ui/Spinner.js'
 
-type SortOption = 'volume' | 'newest' | 'expiring'
+import type { MarketCategory } from '../../lib/types.js'
+
+type SortOption = 'volume' | 'newest' | 'expiry'
 
 export function Markets() {
-  const [category, setCategory] = useState<number | null>(null)
+  const [category, setCategory] = useState<MarketCategory | null>(null)
   const [sort, setSort] = useState<SortOption>('volume')
-  const { data: markets = [], isLoading, isError } = useMarkets({ category, sort })
+  const { data: markets = [], isLoading, isError } = useMarkets({ category: category ?? undefined, sort })
 
   return (
     <div className="space-y-5">
@@ -34,7 +36,7 @@ export function Markets() {
         >
           <option value="volume">MOST VOLUME</option>
           <option value="newest">NEWEST</option>
-          <option value="expiring">EXPIRING SOON</option>
+          <option value="expiry">EXPIRING SOON</option>
         </select>
       </div>
 

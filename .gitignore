@@ -13,6 +13,9 @@ build/
 .env.*.local
 !.env.example
 
+# Wallet files
+test-wallet.json
+
 # Clarinet
 .clarinet/
 .cache/

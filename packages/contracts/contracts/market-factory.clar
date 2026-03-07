@@ -1,6 +1,6 @@
 ;; market-factory.clar
 ;; Creates and manages binary Yes/No prediction markets
-;; Satoshi Bets — XXIX Labs 2026
+;; Satoshi Bets - XXIX Labs 2026
 
 ;; ============================================================
 ;; CONSTANTS
@@ -144,8 +144,8 @@
   )
 )
 
-;; Emergency admin override — allows admin to resolve directly (bypasses oracle)
-;; Normal resolution path goes through oracle-registry → market-amm.resolve
+;; Emergency admin override - allows admin to resolve directly (bypasses oracle)
+;; Normal resolution path goes through oracle-registry -> market-amm.resolve
 ;; This function is the admin circuit breaker for emergencies
 (define-public (resolve-market (market-id uint) (outcome bool))
   (begin

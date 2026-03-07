@@ -2,19 +2,9 @@ import { useQuery } from '@tanstack/react-query'
 import { formatSbtc } from '../../lib/formatters.js'
 import { Spinner } from '../ui/Spinner.js'
 import { api } from '../../lib/api.js'
+import type { Analytics } from '../../lib/types.js'
 
 const ADMIN_KEY = import.meta.env.VITE_ADMIN_API_KEY || ''
-
-interface Analytics {
-  totalMarkets: number
-  activeMarkets: number
-  resolvedMarkets: number
-  totalVolume: number
-  totalFees: number
-  uniqueTraders: number
-  aiMarketsCreated: number
-  oracleResolutions: number
-}
 
 export function AnalyticsDash() {
   const { data: a, isLoading } = useQuery<Analytics>({

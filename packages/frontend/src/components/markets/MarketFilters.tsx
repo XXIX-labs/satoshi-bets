@@ -1,16 +1,17 @@
 import { clsx } from 'clsx'
 import { CATEGORY_LABELS } from '../../lib/formatters.js'
+import type { MarketCategory } from '../../lib/types.js'
 
 interface MarketFiltersProps {
-  selected: number | null
-  onSelect: (category: number | null) => void
+  selected: MarketCategory | null
+  onSelect: (category: MarketCategory | null) => void
 }
 
 export function MarketFilters({ selected, onSelect }: MarketFiltersProps) {
-  const categories = [
+  const categories: { id: MarketCategory | null; label: string }[] = [
     { id: null, label: 'ALL' },
     ...Object.entries(CATEGORY_LABELS).map(([id, label]) => ({
-      id: parseInt(id),
+      id: id as MarketCategory,
       label: label.toUpperCase(),
     })),
   ]

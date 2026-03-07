@@ -1,19 +1,31 @@
 import { useParams, Link } from 'react-router-dom'
-import { useMarketDetail } from '../../hooks/useMarketDetail.js'
+import { useMarketDetail, usePriceHistory } from '../../hooks/useMarketDetail.js'
 import { TradingPanel } from '../../components/trading/TradingPanel.js'
 import { ProbabilityChart } from '../../components/charts/ProbabilityChart.js'
 import { ResearchPanel } from '../../components/research/ResearchPanel.js'
 import { Badge } from '../../components/ui/Badge.js'
 import { Spinner } from '../../components/ui/Spinner.js'
-import { formatSbtc, formatProbability, CATEGORY_LABELS, blockToDate } from '../../lib/formatters.js'
+import { formatSbtc, CATEGORY_LABELS, blockToDate } from '../../lib/formatters.js'
 import { clsx } from 'clsx'
+import type { MarketStatus } from '../../lib/types.js'
+
+const STATUS_VARIANT: Record<MarketStatus, 'green' | 'yellow' | 'orange' | 'red'> = {
+  active: 'green',
+  paused: 'yellow',
+  resolved: 'orange',
+  cancelled: 'red',
+}
 
 export function MarketDetail() {
   const { id } = useParams<{ id: string }>()
   const marketId = parseInt(id || '0', 10)
-  const { market, pool, priceHistory, isLoading } = useMarketDetail(marketId)
+  const { data: detail, isLoading } = useMarketDetail(marketId)
+  const { data: priceHistory } = usePriceHistory(marketId)
 
   if (isLoading) return <div className="flex justify-center py-24"><Spinner /></div>
+
+  const market = detail?.market
+  const pool = detail?.pool ?? null
 
   if (!market) {
     return (
@@ -26,12 +38,7 @@ export function MarketDetail() {
     )
   }
 
-  const statusVariant = {
-    active: 'green' as const,
-    paused: 'yellow' as const,
-    resolved: 'orange' as const,
-    cancelled: 'red' as const,
-  }[market.status] ?? ('gray' as const)
+  const statusVariant = STATUS_VARIANT[market.status] ?? ('gray' as const)
 
   const yesPrice = pool ? pool.noPool / (pool.yesPool + pool.noPool) : 0.5
   const yesPct = yesPrice * 100

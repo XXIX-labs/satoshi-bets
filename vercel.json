@@ -1,0 +1,7 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "framework": "vite",
+  "installCommand": "corepack enable && pnpm install",
+  "buildCommand": "pnpm --filter @satoshi-bets/frontend build",
+  "outputDirectory": "packages/frontend/dist"
+}

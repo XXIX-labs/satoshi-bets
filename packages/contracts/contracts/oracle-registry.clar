@@ -1,6 +1,6 @@
 ;; oracle-registry.clar
 ;; Manages oracle authorization, resolution submission, disputes, and finalization
-;; Satoshi Bets — XXIX Labs 2026
+;; Satoshi Bets - XXIX Labs 2026
 
 (use-trait sip010-trait .sip010-ft-trait.sip010-ft-trait)
 
@@ -28,7 +28,7 @@
 (define-constant RESOLUTION-STATUS-FINALIZED u3)
 (define-constant RESOLUTION-STATUS-OVERRIDDEN u4)
 
-;; 144 blocks ≈ 24 hours (10min/block on Stacks post-Nakamoto)
+;; 144 blocks ~ 24 hours (10min/block on Stacks post-Nakamoto)
 (define-constant DISPUTE-WINDOW-BLOCKS u144)
 ;; Minimum dispute stake: 0.01 sBTC (in sats * 10^2, matching sBTC 8-decimal representation)
 (define-constant MIN-DISPUTE-STAKE u1000000)

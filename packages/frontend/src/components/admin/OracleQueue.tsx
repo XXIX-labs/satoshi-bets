@@ -4,17 +4,9 @@ import { Button } from '../ui/Button.js'
 import { Spinner } from '../ui/Spinner.js'
 import { useUiStore } from '../../stores/uiStore.js'
 import { api } from '../../lib/api.js'
-import type { Market } from '../../lib/types.js'
+import type { OracleQueueItem } from '../../lib/types.js'
 
 const ADMIN_KEY = import.meta.env.VITE_ADMIN_API_KEY || ''
-
-interface OracleQueueItem {
-  market: Market
-  status: 'pending' | 'submitted' | 'disputed' | 'finalized'
-  confidence?: number
-  outcome?: boolean
-  reasoning?: string
-}
 
 const STATUS_MAP: Record<string, { variant: 'gray' | 'orange' | 'red' | 'green'; label: string }> = {
   pending:   { variant: 'gray', label: 'PENDING' },
