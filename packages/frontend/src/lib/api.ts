@@ -1,5 +1,5 @@
 import { API_URL } from '../config/stacks.js'
-import type { Market, MarketPool, AiResearchBrief, PythPrice, PortfolioSummary } from './types.js'
+import type { Market, MarketPool, AiResearchBrief, PythPrice, PortfolioData } from './types.js'
 
 async function fetchApi<T>(path: string, options?: RequestInit): Promise<T> {
   const res = await fetch(`${API_URL}${path}`, {
@@ -33,12 +33,49 @@ export const api = {
       }),
   },
   portfolio: {
-    get: (address: string) => fetchApi<PortfolioSummary>(`/portfolio/${address}`),
+    get: (address: string) => fetchApi<PortfolioData>(`/portfolio/${address}`),
   },
   price: {
     btc: () => fetchApi<PythPrice>('/price/btc'),
   },
   oracle: {
     get: (marketId: number) => fetchApi(`/oracle/${marketId}`),
+  },
+  admin: {
+    pendingMarkets: (key: string) =>
+      fetchApi('/admin/pending-markets', { headers: { 'X-API-Key': key } }),
+    approveMarket: (proposalId: string, key: string) =>
+      fetchApi('/admin/approve-market', {
+        method: 'POST',
+        headers: { 'X-API-Key': key },
+        body: JSON.stringify({ proposalId }),
+      }),
+    rejectMarket: (proposalId: string, key: string) =>
+      fetchApi('/admin/reject-market', {
+        method: 'POST',
+        headers: { 'X-API-Key': key },
+        body: JSON.stringify({ proposalId }),
+      }),
+    generateMarkets: (key: string) =>
+      fetchApi('/admin/generate-markets', {
+        method: 'POST',
+        headers: { 'X-API-Key': key },
+      }),
+    oracleQueue: (key: string) =>
+      fetchApi('/admin/oracle-queue', { headers: { 'X-API-Key': key } }),
+    runOracle: (marketId: number, key: string) =>
+      fetchApi('/admin/run-oracle', {
+        method: 'POST',
+        headers: { 'X-API-Key': key },
+        body: JSON.stringify({ marketId }),
+      }),
+    finalizeOracle: (marketId: number, key: string) =>
+      fetchApi('/admin/finalize-oracle', {
+        method: 'POST',
+        headers: { 'X-API-Key': key },
+        body: JSON.stringify({ marketId }),
+      }),
+    analytics: (key: string) =>
+      fetchApi('/admin/analytics', { headers: { 'X-API-Key': key } }),
   },
 }

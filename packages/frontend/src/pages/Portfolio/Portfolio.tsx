@@ -14,70 +14,60 @@ export function Portfolio() {
 
   if (!address) {
     return (
-      <div className="flex flex-col items-center justify-center py-24 gap-4">
-        <div className="rounded-full border border-white/10 bg-white/5 p-6">
-          <svg className="h-10 w-10 text-white/20" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
-          </svg>
+      <div className="flex flex-col items-center justify-center py-24 gap-5 animate-fade-up">
+        <div className="h-16 w-16 rounded-lg border border-border bg-s0 flex items-center justify-center">
+          <span className="font-mono text-2xl text-t4">₿</span>
         </div>
         <div className="text-center">
-          <h2 className="text-xl font-bold text-white">Connect Your Wallet</h2>
-          <p className="mt-1 text-sm text-white/40">Connect to view your positions and P&L</p>
+          <h2 className="font-display text-xl font-bold text-t1">CONNECT WALLET</h2>
+          <p className="mt-1 font-mono text-xs text-t3">View positions and P&L</p>
         </div>
-        <Button onClick={openWalletModal}>Connect Wallet</Button>
+        <Button onClick={openWalletModal}>CONNECT</Button>
       </div>
     )
   }
 
-  if (isLoading) {
-    return (
-      <div className="flex justify-center py-24">
-        <Spinner />
-      </div>
-    )
-  }
+  if (isLoading) return <div className="flex justify-center py-24"><Spinner /></div>
 
   if (!portfolio || portfolio.positions.length === 0) {
     return (
-      <div className="space-y-6">
-        <div>
-          <h1 className="text-3xl font-bold text-white">Portfolio</h1>
-          <p className="mt-1 text-sm text-white/40 font-mono">{address.slice(0, 8)}...{address.slice(-4)}</p>
-        </div>
-        <div className="rounded-2xl border border-white/8 bg-surface p-12 text-center">
-          <p className="text-white/40">No positions yet</p>
-          <p className="mt-1 text-sm text-white/20">Trade on any open market to get started</p>
+      <div className="space-y-5 animate-fade-up">
+        <header>
+          <h1 className="font-display text-2xl font-extrabold tracking-tight text-t1">PORTFOLIO</h1>
+          <p className="mt-1 font-mono text-xs text-t3">{address}</p>
+        </header>
+        <div className="rounded-lg border border-border bg-s0 p-12 text-center">
+          <p className="font-mono text-xs text-t3">NO POSITIONS</p>
+          <p className="mt-1 font-mono text-[10px] text-t4">Trade on any open market</p>
         </div>
       </div>
     )
   }
 
-  const claimablePositions = portfolio.positions.filter(
+  const claimable = portfolio.positions.filter(
     (p) => p.isResolved && !p.claimed && (p.outcome ? p.yesShares > 0 : p.noShares > 0)
   )
-  const openPositions = portfolio.positions.filter((p) => !p.isResolved)
-  const settledPositions = portfolio.positions.filter((p) => p.isResolved && p.claimed)
+  const open = portfolio.positions.filter((p) => !p.isResolved)
+  const settled = portfolio.positions.filter((p) => p.isResolved && p.claimed)
 
   return (
-    <div className="space-y-8">
-      <div>
-        <h1 className="text-3xl font-bold text-white">Portfolio</h1>
-        <p className="mt-1 text-sm text-white/40 font-mono">{address}</p>
-      </div>
+    <div className="space-y-6 animate-fade-up">
+      <header>
+        <h1 className="font-display text-2xl font-extrabold tracking-tight text-t1">PORTFOLIO</h1>
+        <p className="mt-1 font-mono text-xs text-t3">{address}</p>
+      </header>
 
       <PnLSummary summary={portfolio.summary} />
 
-      {claimablePositions.length > 0 && (
+      {claimable.length > 0 && (
         <section>
-          <h2 className="mb-4 text-lg font-semibold text-orange-400">
-            Claim Winnings ({claimablePositions.length})
+          <h2 className="mb-3 font-display text-sm font-bold text-orange tracking-wider">
+            CLAIM WINNINGS ({claimable.length})
           </h2>
-          <div className="space-y-3">
-            {claimablePositions.map((pos) => (
-              <div key={pos.marketId} className="flex items-center gap-4">
-                <div className="flex-1">
-                  <PositionRow position={pos} />
-                </div>
+          <div className="space-y-1.5 stagger">
+            {claimable.map((pos) => (
+              <div key={pos.marketId} className="flex items-center gap-3">
+                <div className="flex-1"><PositionRow position={pos} /></div>
                 <ClaimButton position={pos} address={address} />
               </div>
             ))}
@@ -85,24 +75,20 @@ export function Portfolio() {
         </section>
       )}
 
-      {openPositions.length > 0 && (
+      {open.length > 0 && (
         <section>
-          <h2 className="mb-4 text-lg font-semibold text-white">Open Positions ({openPositions.length})</h2>
-          <div className="space-y-3">
-            {openPositions.map((pos) => (
-              <PositionRow key={pos.marketId} position={pos} />
-            ))}
+          <h2 className="mb-3 font-display text-sm font-bold text-t1 tracking-wider">OPEN ({open.length})</h2>
+          <div className="space-y-1.5 stagger">
+            {open.map((pos) => <PositionRow key={pos.marketId} position={pos} />)}
           </div>
         </section>
       )}
 
-      {settledPositions.length > 0 && (
+      {settled.length > 0 && (
         <section>
-          <h2 className="mb-4 text-lg font-semibold text-white/40">Settled ({settledPositions.length})</h2>
-          <div className="space-y-3">
-            {settledPositions.map((pos) => (
-              <PositionRow key={pos.marketId} position={pos} />
-            ))}
+          <h2 className="mb-3 font-display text-sm font-bold text-t3 tracking-wider">SETTLED ({settled.length})</h2>
+          <div className="space-y-1.5 stagger">
+            {settled.map((pos) => <PositionRow key={pos.marketId} position={pos} />)}
           </div>
         </section>
       )}

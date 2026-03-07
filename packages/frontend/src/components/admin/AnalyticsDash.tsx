@@ -17,72 +17,58 @@ interface Analytics {
 }
 
 export function AnalyticsDash() {
-  const { data: analytics, isLoading } = useQuery<Analytics>({
+  const { data: a, isLoading } = useQuery<Analytics>({
     queryKey: ['admin', 'analytics'],
     queryFn: () => api.admin.analytics(ADMIN_KEY),
     refetchInterval: 60000,
   })
 
-  if (isLoading || !analytics) {
-    return (
-      <div className="flex items-center justify-center py-12">
-        <Spinner />
-      </div>
-    )
-  }
+  if (isLoading || !a) return <div className="flex justify-center py-12"><Spinner /></div>
 
   const stats = [
-    { label: 'Total Markets', value: analytics.totalMarkets.toString(), sub: `${analytics.activeMarkets} active` },
-    { label: 'Total Volume', value: formatSbtc(analytics.totalVolume, 4), sub: 'sBTC traded' },
-    { label: 'Protocol Fees', value: formatSbtc(analytics.totalFees, 6), sub: 'sBTC collected' },
-    { label: 'Unique Traders', value: analytics.uniqueTraders.toString(), sub: 'wallet addresses' },
-    { label: 'AI Markets', value: analytics.aiMarketsCreated.toString(), sub: 'Claude-generated' },
-    { label: 'Oracle Resolutions', value: analytics.oracleResolutions.toString(), sub: 'automated' },
+    { label: 'MARKETS', value: a.totalMarkets.toString(), sub: `${a.activeMarkets} active` },
+    { label: 'VOLUME', value: formatSbtc(a.totalVolume, 4), sub: 'sBTC traded' },
+    { label: 'FEES', value: formatSbtc(a.totalFees, 6), sub: 'sBTC collected' },
+    { label: 'TRADERS', value: a.uniqueTraders.toString(), sub: 'unique wallets' },
+    { label: 'AI MARKETS', value: a.aiMarketsCreated.toString(), sub: 'Claude-generated' },
+    { label: 'RESOLUTIONS', value: a.oracleResolutions.toString(), sub: 'automated' },
   ]
 
+  const resRate = a.totalMarkets > 0 ? (a.resolvedMarkets / a.totalMarkets) * 100 : 0
+  const aiShare = a.totalMarkets > 0 ? (a.aiMarketsCreated / a.totalMarkets) * 100 : 0
+
   return (
-    <div className="space-y-6">
-      <div className="grid grid-cols-2 gap-4 sm:grid-cols-3">
-        {stats.map((stat) => (
-          <div key={stat.label} className="rounded-2xl border border-white/8 bg-surface p-5">
-            <p className="text-xs text-white/40">{stat.label}</p>
-            <p className="mt-2 font-mono text-2xl font-bold text-white">{stat.value}</p>
-            <p className="mt-0.5 text-xs text-white/30">{stat.sub}</p>
+    <div className="space-y-4 animate-fade-up">
+      <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
+        {stats.map((s) => (
+          <div key={s.label} className="rounded-lg border border-border bg-s0 p-4">
+            <span className="font-mono text-[9px] text-t4 tracking-widest">{s.label}</span>
+            <p className="mt-1.5 font-mono text-2xl font-bold text-t1 tabular-nums">{s.value}</p>
+            <p className="mt-0.5 font-mono text-[10px] text-t4">{s.sub}</p>
           </div>
         ))}
       </div>
 
-      <div className="rounded-2xl border border-white/8 bg-surface p-5">
-        <h3 className="text-sm font-semibold text-white mb-4">Market Health</h3>
-        <div className="space-y-3">
-          <ProgressBar
-            label="Resolution Rate"
-            value={analytics.totalMarkets > 0 ? (analytics.resolvedMarkets / analytics.totalMarkets) * 100 : 0}
-            color="orange"
-          />
-          <ProgressBar
-            label="AI Market Share"
-            value={analytics.totalMarkets > 0 ? (analytics.aiMarketsCreated / analytics.totalMarkets) * 100 : 0}
-            color="blue"
-          />
-        </div>
+      <div className="rounded-lg border border-border bg-s0 p-4 space-y-4">
+        <span className="font-display text-sm font-bold text-t1">HEALTH</span>
+        <BarMeter label="RESOLUTION RATE" value={resRate} />
+        <BarMeter label="AI MARKET SHARE" value={aiShare} />
       </div>
     </div>
   )
 }
 
-function ProgressBar({ label, value, color }: { label: string; value: number; color: string }) {
-  const colorClass = color === 'orange' ? 'bg-orange-500' : 'bg-blue-500'
+function BarMeter({ label, value }: { label: string; value: number }) {
   return (
     <div>
-      <div className="flex justify-between text-xs mb-1">
-        <span className="text-white/40">{label}</span>
-        <span className="text-white/60">{value.toFixed(1)}%</span>
+      <div className="flex justify-between mb-1">
+        <span className="font-mono text-[10px] text-t3 tracking-wider">{label}</span>
+        <span className="font-mono text-[10px] text-t2 tabular-nums">{value.toFixed(1)}%</span>
       </div>
-      <div className="h-2 rounded-full bg-white/8">
+      <div className="h-1.5 rounded-sm bg-s2 overflow-hidden">
         <div
-          className={`h-2 rounded-full transition-all ${colorClass}`}
-          style={{ width: `${Math.min(100, value)}%` }}
+          className="h-full rounded-sm bg-orange prob-bar"
+          style={{ '--bar-width': `${Math.min(100, value)}%`, width: `${Math.min(100, value)}%` } as React.CSSProperties}
         />
       </div>
     </div>

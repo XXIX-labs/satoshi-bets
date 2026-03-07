@@ -1,9 +1,8 @@
-import { useState } from 'react'
 import { clsx } from 'clsx'
 
 interface ShareInputProps {
   value: string
-  onChange: (v: string) => void
+  onChange: (value: string) => void
   side: 'YES' | 'NO'
   onSideChange: (side: 'YES' | 'NO') => void
   disabled?: boolean
@@ -14,20 +13,21 @@ const QUICK_AMOUNTS = ['0.01', '0.05', '0.1', '0.5']
 export function ShareInput({ value, onChange, side, onSideChange, disabled }: ShareInputProps) {
   return (
     <div className="space-y-3">
-      {/* YES / NO toggle */}
-      <div className="flex rounded-xl border border-white/10 bg-dark-50 p-1">
+      {/* Side toggle */}
+      <div className="grid grid-cols-2 gap-1 rounded-md border border-border bg-bg p-1">
         {(['YES', 'NO'] as const).map((s) => (
           <button
             key={s}
             onClick={() => onSideChange(s)}
             disabled={disabled}
             className={clsx(
-              'flex-1 rounded-lg py-2.5 text-sm font-semibold transition-all',
+              'rounded py-2 font-mono text-[12px] font-bold tracking-wider transition-all duration-150',
               side === s
                 ? s === 'YES'
-                  ? 'bg-green-500 text-white shadow'
-                  : 'bg-red-500 text-white shadow'
-                : 'text-white/50 hover:text-white/80'
+                  ? 'bg-yes/15 text-yes border border-yes/30 shadow-yes-sm'
+                  : 'bg-no/15 text-no border border-no/30 shadow-no-sm'
+                : 'text-t3 border border-transparent hover:text-t1',
+              'disabled:opacity-40'
             )}
           >
             {s}
@@ -37,27 +37,48 @@ export function ShareInput({ value, onChange, side, onSideChange, disabled }: Sh
 
       {/* Amount input */}
       <div className="relative">
-        <input
-          type="number"
-          value={value}
-          onChange={(e) => onChange(e.target.value)}
-          disabled={disabled}
-          placeholder="0.00"
-          min="0"
-          step="0.001"
-          className="w-full rounded-xl border border-white/10 bg-dark-50 py-3 pl-4 pr-20 font-mono text-lg text-white placeholder-white/20 focus:border-orange-500/50 focus:outline-none disabled:opacity-50"
-        />
-        <span className="absolute right-4 top-1/2 -translate-y-1/2 text-sm font-medium text-white/40">sBTC</span>
+        <label className="block font-mono text-[10px] text-t4 tracking-wider mb-1.5">
+          AMOUNT (sBTC)
+        </label>
+        <div className="relative">
+          <input
+            type="number"
+            value={value}
+            onChange={(e) => onChange(e.target.value)}
+            placeholder="0.00"
+            disabled={disabled}
+            className={clsx(
+              'w-full rounded-md border border-border bg-bg px-4 py-3',
+              'font-mono text-lg font-medium text-t1 tabular-nums',
+              'placeholder:text-t4',
+              'focus:border-orange/50 focus:outline-none focus:ring-1 focus:ring-orange/20',
+              'disabled:opacity-40',
+              'transition-all duration-150'
+            )}
+            step="0.01"
+            min="0"
+          />
+          <span className="absolute right-4 top-1/2 -translate-y-1/2 font-mono text-[11px] text-t3">
+            sBTC
+          </span>
+        </div>
       </div>
 
       {/* Quick amounts */}
-      <div className="flex gap-2">
+      <div className="flex gap-1.5">
         {QUICK_AMOUNTS.map((amt) => (
           <button
             key={amt}
             onClick={() => onChange(amt)}
             disabled={disabled}
-            className="flex-1 rounded-lg border border-white/10 py-1.5 text-xs text-white/50 transition-colors hover:border-orange-500/30 hover:text-orange-400 disabled:opacity-40"
+            className={clsx(
+              'flex-1 rounded border border-border bg-s0 py-1.5',
+              'font-mono text-[10px] text-t3',
+              'hover:border-border-active hover:text-t1 hover:bg-s1',
+              'active:scale-[0.97]',
+              'transition-all duration-100',
+              'disabled:opacity-40'
+            )}
           >
             {amt}
           </button>

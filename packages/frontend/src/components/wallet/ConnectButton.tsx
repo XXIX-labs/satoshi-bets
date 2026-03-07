@@ -5,24 +5,31 @@ import { truncateAddress } from '../../lib/formatters.js'
 
 export function ConnectButton() {
   const { address, disconnect } = useWalletStore()
-  const openWalletModal = useUiStore((s) => s.openWalletModal)
+  const { openWalletModal } = useUiStore()
 
-  if (address) {
+  if (!address) {
     return (
-      <div className="flex items-center gap-2">
-        <span className="rounded-lg border border-orange-500/30 bg-orange-500/10 px-3 py-1.5 font-mono text-sm text-orange-400">
-          {truncateAddress(address)}
-        </span>
-        <Button variant="ghost" size="sm" onClick={disconnect}>
-          Disconnect
-        </Button>
-      </div>
+      <Button size="sm" onClick={openWalletModal}>
+        CONNECT
+      </Button>
     )
   }
 
   return (
-    <Button onClick={openWalletModal} size="md">
-      Connect Wallet
-    </Button>
+    <div className="flex items-center gap-2">
+      <div className="flex items-center gap-2 rounded border border-border bg-s0 px-3 py-1.5">
+        <span className="h-1.5 w-1.5 rounded-full bg-yes animate-pulse-orange" />
+        <span className="font-mono text-[11px] text-t2">
+          {truncateAddress(address)}
+        </span>
+      </div>
+      <Button
+        variant="ghost"
+        size="sm"
+        onClick={disconnect}
+      >
+        ✕
+      </Button>
+    </div>
   )
 }

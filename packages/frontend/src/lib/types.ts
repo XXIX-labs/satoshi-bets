@@ -1,4 +1,3 @@
-// Frontend-side type aliases mirroring backend types
 export type MarketStatus = 'active' | 'paused' | 'resolved' | 'cancelled'
 export type MarketCategory = 'crypto' | 'stacks' | 'macro' | 'regulation' | 'tech' | 'global'
 
@@ -30,11 +29,15 @@ export interface MarketPool {
 
 export interface MarketPosition {
   marketId: number
+  question: string
   trader: string
   yesShares: number
   noShares: number
   costBasis: number
+  currentValue: number
   claimed: boolean
+  isResolved: boolean
+  outcome?: boolean
 }
 
 export interface PythPrice {
@@ -44,36 +47,40 @@ export interface PythPrice {
   feedId: string
 }
 
-export interface ResearchArgument {
-  title: string
-  body: string
-  sourceUrl?: string
-  weight: number
-}
-
 export interface AiResearchBrief {
   marketId: number
   question: string
-  yesArguments: ResearchArgument[]
-  noArguments: ResearchArgument[]
+  bullishCase: string
+  bearishCase: string
+  keyFactors: string[]
+  summary: string
+  probabilityEstimate: number
   sources: string[]
-  sentiment: 'bullish' | 'bearish' | 'neutral'
-  confidenceScore: number
   generatedAt: string
   cachedUntil: string
 }
 
-export interface PortfolioSummary {
-  address: string
-  positions: PositionWithMarket[]
-  totalInvested: number
-  unrealizedPnl: number
-  claimableWinnings: number
+export interface AiMarketProposal {
+  id: string
+  question: string
+  description: string
+  category: number
+  confidence: number
+  initialProbability: number
+  oracleType: string
+  resolutionCriteria: string
 }
 
-export interface PositionWithMarket extends MarketPosition {
-  market: Market
-  pool?: MarketPool
-  currentValue?: number
-  unrealizedPnl?: number
+export interface PortfolioSummary {
+  totalCostBasis: number
+  totalCurrentValue: number
+  claimableAmount: number
+  openPositions: number
+  resolvedPositions: number
+}
+
+export interface PortfolioData {
+  address: string
+  positions: MarketPosition[]
+  summary: PortfolioSummary
 }

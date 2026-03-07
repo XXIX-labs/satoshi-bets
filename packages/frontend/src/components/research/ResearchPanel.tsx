@@ -19,103 +19,85 @@ export function ResearchPanel({ market }: ResearchPanelProps) {
 
   if (!expanded) {
     return (
-      <div className="rounded-2xl border border-white/8 bg-surface p-5">
+      <div className="rounded-lg border border-border bg-s0 p-4">
         <div className="flex items-center justify-between">
           <div>
-            <h3 className="font-semibold text-white">AI Research Brief</h3>
-            <p className="mt-0.5 text-xs text-white/40">Powered by Claude claude-sonnet-4-6</p>
+            <h3 className="font-display text-sm font-bold text-t1">AI RESEARCH BRIEF</h3>
+            <p className="mt-0.5 font-mono text-[10px] text-t4 tracking-wider">CLAUDE SONNET 4.6</p>
           </div>
-          <Button variant="secondary" size="sm" onClick={handleExpand}>
-            View Analysis
-          </Button>
+          <Button variant="secondary" size="sm" onClick={handleExpand}>ANALYZE</Button>
         </div>
       </div>
     )
   }
 
   return (
-    <div className="rounded-2xl border border-white/8 bg-surface p-5 space-y-4">
-      <div className="flex items-center justify-between">
+    <div className="rounded-lg border border-border bg-s0 overflow-hidden">
+      <div className="flex items-center justify-between border-b border-border px-4 py-3">
         <div>
-          <h3 className="font-semibold text-white">AI Research Brief</h3>
-          <p className="mt-0.5 text-xs text-white/40">Powered by Claude claude-sonnet-4-6</p>
+          <h3 className="font-display text-sm font-bold text-t1">AI RESEARCH BRIEF</h3>
+          <p className="mt-0.5 font-mono text-[10px] text-t4 tracking-wider">CLAUDE SONNET 4.6</p>
         </div>
-        <Button variant="ghost" size="sm" onClick={() => setExpanded(false)}>
-          Collapse
-        </Button>
+        <Button variant="ghost" size="sm" onClick={() => setExpanded(false)}>CLOSE</Button>
       </div>
 
-      {isLoading && (
-        <div className="flex items-center justify-center py-8 gap-3">
-          <Spinner size="sm" />
-          <span className="text-sm text-white/40">Analyzing market data...</span>
-        </div>
-      )}
+      <div className="p-4 space-y-4">
+        {isLoading && (
+          <div className="flex items-center justify-center py-8 gap-3">
+            <Spinner size="sm" />
+            <span className="font-mono text-xs text-t3">Analyzing market data...</span>
+          </div>
+        )}
 
-      {research && !isLoading && (
-        <div className="space-y-4">
-          <div className="flex gap-3">
-            <div className="flex-1 rounded-xl border border-green-500/20 bg-green-500/5 p-4">
-              <div className="mb-2 flex items-center gap-2">
-                <div className="h-2 w-2 rounded-full bg-green-500" />
-                <span className="text-xs font-semibold uppercase tracking-wide text-green-400">YES Case</span>
+        {research && !isLoading && (
+          <>
+            {/* Bull vs Bear */}
+            <div className="grid grid-cols-2 gap-2">
+              <div className="rounded-md border border-yes/20 bg-yes/5 p-4">
+                <div className="flex items-center gap-2 mb-2">
+                  <span className="h-1.5 w-1.5 rounded-full bg-yes" />
+                  <span className="font-mono text-[9px] font-bold tracking-widest text-yes">YES CASE</span>
+                </div>
+                <p className="font-mono text-[11px] leading-relaxed text-t2">{research.bullishCase}</p>
               </div>
-              <p className="text-sm leading-relaxed text-white/70">{research.bullishCase}</p>
-            </div>
-            <div className="flex-1 rounded-xl border border-red-500/20 bg-red-500/5 p-4">
-              <div className="mb-2 flex items-center gap-2">
-                <div className="h-2 w-2 rounded-full bg-red-500" />
-                <span className="text-xs font-semibold uppercase tracking-wide text-red-400">NO Case</span>
+              <div className="rounded-md border border-no/20 bg-no/5 p-4">
+                <div className="flex items-center gap-2 mb-2">
+                  <span className="h-1.5 w-1.5 rounded-full bg-no" />
+                  <span className="font-mono text-[9px] font-bold tracking-widest text-no">NO CASE</span>
+                </div>
+                <p className="font-mono text-[11px] leading-relaxed text-t2">{research.bearishCase}</p>
               </div>
-              <p className="text-sm leading-relaxed text-white/70">{research.bearishCase}</p>
             </div>
-          </div>
 
-          <div className="rounded-xl border border-white/8 bg-dark-50 p-4">
-            <h4 className="mb-2 text-xs font-semibold uppercase tracking-wide text-white/40">Key Factors</h4>
-            <ul className="space-y-1.5">
-              {research.keyFactors.map((factor, i) => (
-                <li key={i} className="flex items-start gap-2 text-sm text-white/60">
-                  <span className="mt-1 h-1.5 w-1.5 flex-shrink-0 rounded-full bg-orange-500" />
-                  {factor}
-                </li>
-              ))}
-            </ul>
-          </div>
-
-          <div className="flex items-center justify-between rounded-xl border border-orange-500/20 bg-orange-500/5 p-4">
-            <div>
-              <p className="text-xs text-white/40">AI Confidence Assessment</p>
-              <p className="mt-1 text-sm font-medium text-white">{research.summary}</p>
-            </div>
-            <div className="text-right">
-              <p className="text-xs text-white/40">Est. Probability</p>
-              <p className="text-2xl font-bold font-mono text-orange-400">
-                {(research.probabilityEstimate * 100).toFixed(0)}%
-              </p>
-            </div>
-          </div>
-
-          {research.sources.length > 0 && (
-            <div>
-              <h4 className="mb-2 text-xs font-semibold uppercase tracking-wide text-white/40">Sources</h4>
-              <div className="flex flex-wrap gap-2">
-                {research.sources.map((src, i) => (
-                  <a
-                    key={i}
-                    href={src}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="rounded-lg border border-white/10 bg-white/5 px-3 py-1 text-xs text-white/50 transition-colors hover:text-orange-400"
-                  >
-                    Source {i + 1}
-                  </a>
+            {/* Key factors */}
+            <div className="rounded-md border border-border bg-bg p-4">
+              <span className="font-mono text-[9px] text-t4 tracking-widest">KEY FACTORS</span>
+              <ul className="mt-2 space-y-1.5">
+                {research.keyFactors.map((factor, i) => (
+                  <li key={i} className="flex items-start gap-2 font-mono text-[11px] text-t2">
+                    <span className="mt-1.5 h-1 w-1 flex-shrink-0 rounded-full bg-orange" />
+                    {factor}
+                  </li>
                 ))}
+              </ul>
+            </div>
+
+            {/* Probability estimate */}
+            <div className="flex items-center justify-between rounded-md border border-orange/20 bg-orange/5 p-4">
+              <div>
+                <span className="font-mono text-[9px] text-t4 tracking-widest">AI ASSESSMENT</span>
+                <p className="mt-1 font-mono text-[11px] text-t1">{research.summary}</p>
+              </div>
+              <div className="text-right">
+                <span className="font-mono text-[9px] text-t4 tracking-widest">EST. PROB</span>
+                <p className="font-mono text-2xl font-bold text-orange tabular-nums">
+                  {(research.probabilityEstimate * 100).toFixed(0)}%
+                </p>
               </div>
             </div>
-          )}
-        </div>
-      )}
+          </>
+        )}
+      </div>
     </div>
   )
 }

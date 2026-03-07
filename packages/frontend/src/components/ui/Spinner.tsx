@@ -1,11 +1,36 @@
 import { clsx } from 'clsx'
 
-export function Spinner({ size = 'md', className }: { size?: 'sm' | 'md' | 'lg'; className?: string }) {
-  const sizes = { sm: 'h-4 w-4', md: 'h-6 w-6', lg: 'h-8 w-8' }
+interface SpinnerProps {
+  size?: 'sm' | 'md' | 'lg'
+  className?: string
+}
+
+export function Spinner({ size = 'md', className }: SpinnerProps) {
   return (
-    <svg className={clsx('animate-spin text-orange-500', sizes[size], className)} fill="none" viewBox="0 0 24 24">
-      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
-    </svg>
+    <div className={clsx('flex items-center gap-1', className)}>
+      {[0, 1, 2].map((i) => (
+        <span
+          key={i}
+          className="inline-block rounded-sm bg-orange animate-pulse-orange"
+          style={{
+            width:  size === 'sm' ? 3 : size === 'lg' ? 5 : 4,
+            height: size === 'sm' ? 12 : size === 'lg' ? 20 : 16,
+            animationDelay: `${i * 0.15}s`,
+          }}
+        />
+      ))}
+    </div>
+  )
+}
+
+/** Skeleton loading block */
+export function Skeleton({ className }: { className?: string }) {
+  return (
+    <div
+      className={clsx(
+        'rounded bg-s1 animate-pulse',
+        className
+      )}
+    />
   )
 }

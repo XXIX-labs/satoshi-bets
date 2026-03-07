@@ -6,6 +6,7 @@ import { AnalyticsDash } from '../../components/admin/AnalyticsDash.js'
 import { Button } from '../../components/ui/Button.js'
 import { useUiStore } from '../../stores/uiStore.js'
 import { api } from '../../lib/api.js'
+import { clsx } from 'clsx'
 
 const ADMIN_KEY = import.meta.env.VITE_ADMIN_API_KEY || ''
 
@@ -16,49 +17,45 @@ export function Admin() {
   const qc = useQueryClient()
   const { addToast } = useUiStore()
 
-  const generateMutation = useMutation({
+  const genMut = useMutation({
     mutationFn: () => api.admin.generateMarkets(ADMIN_KEY),
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ['admin', 'pending-markets'] })
-      addToast({ type: 'success', message: 'Market generation triggered — check back in ~30s' })
+      addToast({ type: 'success', message: 'Market generation triggered' })
     },
-    onError: (err: Error) => addToast({ type: 'error', message: err.message }),
+    onError: (e: Error) => addToast({ type: 'error', message: e.message }),
   })
 
   const tabs: { id: AdminTab; label: string }[] = [
-    { id: 'approvals', label: 'Market Approvals' },
-    { id: 'oracle', label: 'Oracle Queue' },
-    { id: 'analytics', label: 'Analytics' },
+    { id: 'approvals', label: 'APPROVALS' },
+    { id: 'oracle', label: 'ORACLE' },
+    { id: 'analytics', label: 'ANALYTICS' },
   ]
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-5 animate-fade-up">
       <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-3xl font-bold text-white">Admin Dashboard</h1>
-          <p className="mt-1 text-sm text-white/40">Manage markets, oracle resolutions, and platform analytics</p>
-        </div>
-        <Button
-          variant="secondary"
-          size="sm"
-          onClick={() => generateMutation.mutate()}
-          loading={generateMutation.isPending}
-        >
-          Generate Markets
+        <header>
+          <h1 className="font-display text-2xl font-extrabold tracking-tight text-t1">ADMIN</h1>
+          <p className="mt-1 font-mono text-xs text-t3">Markets · Oracle · Analytics</p>
+        </header>
+        <Button variant="secondary" size="sm" onClick={() => genMut.mutate()} loading={genMut.isPending}>
+          GENERATE MARKETS
         </Button>
       </div>
 
       {/* Tab nav */}
-      <div className="flex gap-1 rounded-xl border border-white/8 bg-surface p-1">
+      <div className="flex gap-px rounded-md border border-border bg-border overflow-hidden">
         {tabs.map((t) => (
           <button
             key={t.id}
             onClick={() => setTab(t.id)}
-            className={`flex-1 rounded-lg px-4 py-2 text-sm font-medium transition-all ${
+            className={clsx(
+              'flex-1 py-2.5 font-mono text-[11px] font-medium tracking-wider transition-all',
               tab === t.id
-                ? 'bg-orange-500/15 text-orange-400'
-                : 'text-white/40 hover:text-white/70'
-            }`}
+                ? 'bg-orange/10 text-orange'
+                : 'bg-s0 text-t3 hover:text-t1 hover:bg-s1'
+            )}
           >
             {t.label}
           </button>

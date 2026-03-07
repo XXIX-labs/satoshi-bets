@@ -1,138 +1,135 @@
+import { clsx } from 'clsx'
+
 export function HowItWorks() {
   return (
-    <div className="mx-auto max-w-3xl space-y-12">
-      <div className="text-center">
-        <h1 className="text-4xl font-bold text-white">How It Works</h1>
-        <p className="mt-3 text-white/50">
-          Satoshi Bets is an AI-native binary prediction market built on Bitcoin via Stacks L2.
-          Trade YES/NO on real-world outcomes using sBTC as collateral.
+    <div className="mx-auto max-w-3xl space-y-10 animate-fade-up">
+      {/* Hero */}
+      <header className="text-center py-4">
+        <h1 className="font-display text-3xl font-extrabold tracking-tight text-t1 sm:text-4xl">
+          HOW IT WORKS
+        </h1>
+        <p className="mt-3 font-mono text-xs text-t3 max-w-lg mx-auto leading-relaxed">
+          Binary prediction markets on Bitcoin via Stacks L2.
+          Trade YES/NO with sBTC. AI-generated. Oracle-resolved.
         </p>
-      </div>
+      </header>
 
       {/* Steps */}
-      <div className="space-y-6">
-        {steps.map((step, i) => (
-          <div key={i} className="flex gap-5 rounded-2xl border border-white/8 bg-surface p-6">
-            <div className="flex-shrink-0 flex h-10 w-10 items-center justify-center rounded-full bg-orange-500/15 text-orange-400 font-bold">
+      <div className="space-y-2 stagger">
+        {STEPS.map((step, i) => (
+          <div key={i} className="row-item flex gap-4 rounded-lg border border-border bg-s0 p-5">
+            <div className="flex-shrink-0 flex h-8 w-8 items-center justify-center rounded bg-orange/15 font-mono text-sm font-bold text-orange">
               {i + 1}
             </div>
             <div>
-              <h3 className="font-semibold text-white">{step.title}</h3>
-              <p className="mt-1 text-sm text-white/50 leading-relaxed">{step.description}</p>
+              <h3 className="font-display text-sm font-bold text-t1">{step.title}</h3>
+              <p className="mt-1 font-mono text-[11px] text-t3 leading-relaxed">{step.description}</p>
             </div>
           </div>
         ))}
       </div>
 
-      {/* AMM mechanics */}
-      <div className="rounded-2xl border border-white/8 bg-surface p-6 space-y-4">
-        <h2 className="text-xl font-bold text-white">The AMM Model</h2>
-        <p className="text-sm text-white/50 leading-relaxed">
-          Satoshi Bets uses a <span className="text-orange-400">Constant Product Market Maker (CPMM)</span>:
-          the classic <code className="rounded bg-white/8 px-1.5 py-0.5 font-mono text-xs">x × y = k</code> formula
-          — the same used by Uniswap — applied to prediction shares instead of token pairs.
-        </p>
-        <div className="grid gap-4 sm:grid-cols-3">
-          {fees.map((fee) => (
-            <div key={fee.label} className="rounded-xl bg-dark-50 p-4 text-center">
-              <p className="text-2xl font-bold font-mono text-orange-400">{fee.rate}</p>
-              <p className="mt-1 text-xs text-white/40">{fee.label}</p>
-            </div>
-          ))}
+      {/* AMM */}
+      <section className="rounded-lg border border-border bg-s0 overflow-hidden">
+        <div className="px-5 py-4 border-b border-border">
+          <h2 className="font-display text-lg font-bold text-t1">THE AMM MODEL</h2>
         </div>
-        <div className="rounded-xl bg-dark-50 p-4 space-y-2">
-          <p className="text-xs font-semibold uppercase tracking-wide text-white/40">Price Formula</p>
-          <p className="font-mono text-sm text-white">YES price = NO_pool / (YES_pool + NO_pool)</p>
-          <p className="font-mono text-sm text-white">NO price  = YES_pool / (YES_pool + NO_pool)</p>
-          <p className="text-xs text-white/30 mt-2">Prices always sum to 1.0 (100%)</p>
-        </div>
-      </div>
+        <div className="p-5 space-y-4">
+          <p className="font-mono text-[11px] text-t3 leading-relaxed">
+            Constant Product Market Maker (CPMM):
+            <code className="ml-1 px-1.5 py-0.5 rounded bg-s2 border border-border text-orange text-[10px]">x × y = k</code>
+            — the same formula used by Uniswap, applied to prediction shares.
+          </p>
 
-      {/* Oracle system */}
-      <div className="rounded-2xl border border-white/8 bg-surface p-6 space-y-4">
-        <h2 className="text-xl font-bold text-white">Oracle & Resolution</h2>
-        <div className="grid gap-4 sm:grid-cols-3">
-          {oracles.map((o) => (
-            <div key={o.name} className="rounded-xl bg-dark-50 p-4">
-              <div className="mb-2 flex items-center gap-2">
-                <span className="text-lg">{o.icon}</span>
-                <p className="text-sm font-semibold text-white">{o.name}</p>
+          <div className="grid grid-cols-3 gap-2">
+            {[
+              { rate: '2%', label: 'BUY FEE' },
+              { rate: '1%', label: 'SELL FEE' },
+              { rate: '1%', label: 'CLAIM FEE' },
+            ].map((f) => (
+              <div key={f.label} className="rounded-md border border-border bg-bg p-3 text-center">
+                <p className="font-mono text-xl font-bold text-orange tabular-nums">{f.rate}</p>
+                <p className="mt-0.5 font-mono text-[9px] text-t4 tracking-widest">{f.label}</p>
               </div>
-              <p className="text-xs text-white/40">{o.description}</p>
-            </div>
-          ))}
-        </div>
-        <p className="text-xs text-white/30">
-          All resolutions have a 24-hour dispute window (~144 Stacks blocks). Anyone can stake sBTC
-          to dispute a resolution. If undisputed, the result finalizes automatically on-chain.
-        </p>
-      </div>
+            ))}
+          </div>
 
-      {/* AI modules */}
-      <div className="rounded-2xl border border-white/8 bg-surface p-6 space-y-4">
-        <h2 className="text-xl font-bold text-white">AI-Powered Platform</h2>
-        <div className="grid gap-4 sm:grid-cols-2">
-          {aiModules.map((mod) => (
-            <div key={mod.name} className="rounded-xl border border-orange-500/10 bg-orange-500/5 p-4">
-              <p className="text-sm font-semibold text-orange-400">{mod.name}</p>
-              <p className="mt-1 text-xs text-white/50">{mod.description}</p>
+          <div className="rounded-md border border-border bg-bg p-4 space-y-1.5">
+            <span className="font-mono text-[9px] text-t4 tracking-widest">PRICE FORMULA</span>
+            <p className="font-mono text-[11px] text-t1">YES = NO_pool / (YES_pool + NO_pool)</p>
+            <p className="font-mono text-[11px] text-t1">NO  = YES_pool / (YES_pool + NO_pool)</p>
+            <p className="font-mono text-[10px] text-t4 mt-2">Prices always sum to 1.0 (100%)</p>
+          </div>
+        </div>
+      </section>
+
+      {/* Oracle */}
+      <section className="rounded-lg border border-border bg-s0 overflow-hidden">
+        <div className="px-5 py-4 border-b border-border">
+          <h2 className="font-display text-lg font-bold text-t1">ORACLE & RESOLUTION</h2>
+        </div>
+        <div className="p-5 space-y-3">
+          <div className="grid gap-2 sm:grid-cols-3">
+            {ORACLES.map((o) => (
+              <div key={o.name} className="rounded-md border border-border bg-bg p-4">
+                <p className="font-display text-sm font-bold text-t1">{o.name}</p>
+                <p className="mt-1 font-mono text-[10px] text-t3 leading-relaxed">{o.desc}</p>
+              </div>
+            ))}
+          </div>
+          <p className="font-mono text-[10px] text-t4">
+            All resolutions have a 24h dispute window (~144 Stacks blocks).
+            Stake sBTC to dispute. Undisputed results finalize automatically.
+          </p>
+        </div>
+      </section>
+
+      {/* AI Modules */}
+      <section className="rounded-lg border border-border bg-s0 overflow-hidden">
+        <div className="px-5 py-4 border-b border-border">
+          <h2 className="font-display text-lg font-bold text-t1">AI MODULES</h2>
+          <p className="mt-0.5 font-mono text-[10px] text-t4 tracking-wider">CLAUDE SONNET 4.6</p>
+        </div>
+        <div className="grid gap-px bg-border sm:grid-cols-2">
+          {AI_MODULES.map((m) => (
+            <div key={m.name} className="bg-s0 p-4">
+              <p className="font-display text-sm font-bold text-orange">{m.name}</p>
+              <p className="mt-1 font-mono text-[10px] text-t3 leading-relaxed">{m.desc}</p>
             </div>
           ))}
         </div>
-      </div>
+      </section>
 
       {/* Security */}
-      <div className="rounded-2xl border border-white/8 bg-surface p-6">
-        <h2 className="mb-3 text-xl font-bold text-white">Security & Settlement</h2>
-        <p className="text-sm text-white/50 leading-relaxed">
-          All contracts are written in <span className="text-white/70">Clarity</span> — Stacks' decidable smart contract
-          language. Trades inherit <span className="text-orange-400">Bitcoin finality</span> through the Stacks Nakamoto
-          upgrade. sBTC is a 1:1 Bitcoin-backed asset governed by a decentralized signer set.
-          Mainnet deployment will follow a third-party security audit.
+      <section className="rounded-lg border border-border bg-s0 p-5">
+        <h2 className="font-display text-lg font-bold text-t1 mb-3">SECURITY</h2>
+        <p className="font-mono text-[11px] text-t3 leading-relaxed">
+          Contracts written in <span className="text-t1">Clarity</span> — decidable, non-Turing complete.
+          Trades inherit <span className="text-orange">Bitcoin finality</span> via Stacks Nakamoto.
+          sBTC is 1:1 BTC-backed. Mainnet deployment follows third-party audit.
         </p>
-      </div>
+      </section>
     </div>
   )
 }
 
-const steps = [
-  {
-    title: 'Connect Your Wallet',
-    description: 'Use Leather or Xverse wallet to connect. No sign-up or KYC required — just your Stacks address.',
-  },
-  {
-    title: 'Browse AI-Generated Markets',
-    description: 'Markets are automatically created by Claude every 4 hours based on trending crypto/macro events. Each market has a clear YES/NO question and resolution criteria.',
-  },
-  {
-    title: 'Trade YES or NO Shares',
-    description: 'Deposit sBTC to buy YES or NO shares. The AMM gives you an instant quote showing estimated shares, fee, and price impact before you confirm.',
-  },
-  {
-    title: 'Market Resolves',
-    description: 'When the resolution block arrives, the oracle agent checks on-chain data (Pyth price feeds) and off-chain evidence to determine the outcome.',
-  },
-  {
-    title: 'Claim Your Winnings',
-    description: 'If your side wins, claim your proportional share of the losing pool plus your original stake. 1% claim fee goes to the protocol.',
-  },
+const STEPS = [
+  { title: 'CONNECT WALLET', description: 'Leather or Xverse. No signup. No KYC. Just your Stacks address.' },
+  { title: 'BROWSE MARKETS', description: 'AI-generated every 4h from crypto/macro signals. Clear YES/NO questions with resolution criteria.' },
+  { title: 'TRADE SHARES', description: 'Deposit sBTC to buy YES or NO. Instant quote with shares, fee, and price impact before you sign.' },
+  { title: 'MARKET RESOLVES', description: 'Oracle agent checks Pyth price feeds + off-chain evidence when the resolution block arrives.' },
+  { title: 'CLAIM WINNINGS', description: 'Winners claim their proportional share of the losing pool + original stake. 1% claim fee.' },
 ]
 
-const fees = [
-  { rate: '2%', label: 'Buy fee' },
-  { rate: '1%', label: 'Sell fee' },
-  { rate: '1%', label: 'Claim fee' },
+const ORACLES = [
+  { name: 'PYTH NETWORK', desc: 'Price markets auto-resolve from Pyth VAA proofs at >95% confidence' },
+  { name: 'AI ORACLE', desc: 'Claude researches off-chain events and submits structured evidence' },
+  { name: 'MANUAL OVERRIDE', desc: 'Admin override for disputed resolutions after the 24h window' },
 ]
 
-const oracles = [
-  { icon: '🔗', name: 'Pyth Network', description: 'Price-based markets auto-resolve using Pyth oracle VAA proofs at >95% confidence' },
-  { icon: '🤖', name: 'AI Oracle Agent', description: 'Claude researches off-chain events and submits resolutions with structured evidence' },
-  { icon: '👤', name: 'Manual Override', description: 'Admin can override disputed resolutions after the 24h window' },
-]
-
-const aiModules = [
-  { name: 'Market Generator', description: 'Creates 3 new market proposals every 4h from CoinGecko + NewsAPI signals. Admin approves before deployment.' },
-  { name: 'Research Assistant', description: 'On-demand YES/NO analysis brief for any market. Cached 15 minutes. Cites real sources.' },
-  { name: 'Oracle Agent', description: 'Reads Pyth price feeds + news, evaluates resolution criteria, auto-submits when ≥95% confident.' },
-  { name: 'Market Maker', description: 'Seeds 0.1 sBTC of initial liquidity to every new market pool, split by the initial probability estimate.' },
+const AI_MODULES = [
+  { name: 'MARKET GENERATOR', desc: 'Creates 3 proposals every 4h from CoinGecko + NewsAPI. Admin approves before deploy.' },
+  { name: 'RESEARCH ASSISTANT', desc: 'On-demand YES/NO brief for any market. 15min cache. Real sources.' },
+  { name: 'ORACLE AGENT', desc: 'Evaluates expired markets. Auto-submits when confidence ≥95%.' },
+  { name: 'MARKET MAKER', desc: 'Seeds 0.1 sBTC initial liquidity, split by probability estimate.' },
 ]

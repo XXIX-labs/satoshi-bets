@@ -24,9 +24,8 @@ export function TradingPanel({ market, pool }: TradingPanelProps) {
   const { openWalletModal, addToast } = useUiStore()
 
   const amountNum = parseFloat(amount) || 0
-  const amountSats = Math.floor(amountNum * 1e8)  // sBTC has 8 decimals
+  const amountSats = Math.floor(amountNum * 1e8)
 
-  // Simple quote calculation using CPMM formula client-side
   const quote = pool && amountSats > 0 ? (() => {
     const fee = Math.floor(amountSats * 200 / 10000)
     const afterFee = amountSats - fee
@@ -64,7 +63,7 @@ export function TradingPanel({ market, pool }: TradingPanelProps) {
         functionArgs: [
           Cl.uint(market.id),
           Cl.uint(amountSats),
-          Cl.uint(0), // min-shares-out (no slippage protection in PoC)
+          Cl.uint(0),
           Cl.contractPrincipal(sbtcAddr, sbtcName),
         ],
         network: STACKS_NETWORK as 'testnet' | 'mainnet',
@@ -89,40 +88,59 @@ export function TradingPanel({ market, pool }: TradingPanelProps) {
   const isDisabled = market.status !== 'active' || !pool
 
   return (
-    <div className="space-y-4 rounded-2xl border border-white/8 bg-surface p-5">
-      <h3 className="font-semibold text-white">Trade</h3>
+    <div className="rounded-lg border border-border bg-s0 overflow-hidden">
+      {/* Header */}
+      <div className="flex items-center justify-between border-b border-border px-4 py-3">
+        <span className="font-display text-sm font-bold text-t1">TRADE</span>
+        <span className="font-mono text-[10px] text-t4 tracking-wider">
+          CPMM · x·y=k
+        </span>
+      </div>
 
-      {market.status === 'resolved' && (
-        <div className="rounded-xl bg-white/5 p-3 text-center text-sm text-white/60">
-          Market resolved: <span className="font-semibold text-orange-400">{market.outcome ? 'YES' : 'NO'}</span>
-        </div>
-      )}
+      <div className="p-4 space-y-4">
+        {market.status === 'resolved' && (
+          <div className="rounded-md border border-orange/20 bg-orange/5 px-4 py-3 text-center">
+            <span className="font-mono text-xs text-t2">RESOLVED → </span>
+            <span className="font-mono text-xs font-bold text-orange">
+              {market.outcome ? 'YES' : 'NO'}
+            </span>
+          </div>
+        )}
 
-      <ShareInput
-        value={amount}
-        onChange={setAmount}
-        side={side}
-        onSideChange={setSide}
-        disabled={isDisabled}
-      />
+        <ShareInput
+          value={amount}
+          onChange={setAmount}
+          side={side}
+          onSideChange={setSide}
+          disabled={isDisabled}
+        />
 
-      {quote && <PriceImpact quote={quote} loading={false} side={side} />}
+        {quote && <PriceImpact quote={quote} loading={false} side={side} />}
 
-      <Button
-        onClick={handleTrade}
-        loading={submitting}
-        disabled={isDisabled || amountSats <= 0}
-        className="w-full"
-        size="lg"
-      >
-        {!address ? 'Connect Wallet to Trade'
-          : amountSats <= 0 ? 'Enter an amount'
-          : `Buy ${side}`}
-      </Button>
+        <Button
+          onClick={handleTrade}
+          loading={submitting}
+          disabled={isDisabled || amountSats <= 0}
+          variant={side === 'YES' ? 'yes' : 'no'}
+          className="w-full"
+          size="lg"
+        >
+          {!address
+            ? 'CONNECT WALLET'
+            : amountSats <= 0
+            ? 'ENTER AMOUNT'
+            : `BUY ${side}`}
+        </Button>
+      </div>
 
-      <p className="text-center text-xs text-white/30">
-        2% buy fee · 1% sell fee · Powered by CPMM AMM
-      </p>
+      {/* Footer */}
+      <div className="border-t border-border px-4 py-2.5 flex items-center justify-center gap-3">
+        <span className="font-mono text-[9px] text-t4 tracking-wider">2% BUY FEE</span>
+        <span className="text-t4/30 text-[9px]">·</span>
+        <span className="font-mono text-[9px] text-t4 tracking-wider">1% SELL FEE</span>
+        <span className="text-t4/30 text-[9px]">·</span>
+        <span className="font-mono text-[9px] text-t4 tracking-wider">1% CLAIM FEE</span>
+      </div>
     </div>
   )
 }

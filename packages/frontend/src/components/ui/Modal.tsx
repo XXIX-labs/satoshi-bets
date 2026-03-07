@@ -1,41 +1,62 @@
-import { useEffect } from 'react'
-import { clsx } from 'clsx'
+import { useEffect, useCallback, type ReactNode } from 'react'
 
 interface ModalProps {
   open: boolean
   onClose: () => void
   title?: string
-  children: React.ReactNode
-  size?: 'sm' | 'md' | 'lg'
+  children: ReactNode
 }
 
-export function Modal({ open, onClose, title, children, size = 'md' }: ModalProps) {
+export function Modal({ open, onClose, title, children }: ModalProps) {
+  const handleKey = useCallback((e: KeyboardEvent) => {
+    if (e.key === 'Escape') onClose()
+  }, [onClose])
+
   useEffect(() => {
-    if (!open) return
-    const handler = (e: KeyboardEvent) => { if (e.key === 'Escape') onClose() }
-    document.addEventListener('keydown', handler)
-    return () => document.removeEventListener('keydown', handler)
-  }, [open, onClose])
+    if (open) {
+      document.addEventListener('keydown', handleKey)
+      document.body.style.overflow = 'hidden'
+      return () => {
+        document.removeEventListener('keydown', handleKey)
+        document.body.style.overflow = ''
+      }
+    }
+  }, [open, handleKey])
 
   if (!open) return null
 
-  const sizes = { sm: 'max-w-sm', md: 'max-w-md', lg: 'max-w-lg' }
-
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-      <div className="absolute inset-0 bg-black/70 backdrop-blur-sm" onClick={onClose} />
-      <div className={clsx('relative w-full rounded-2xl border border-white/10 bg-dark-50 shadow-2xl animate-slide-up', sizes[size])}>
-        {title && (
-          <div className="flex items-center justify-between border-b border-white/8 px-6 py-4">
-            <h2 className="text-lg font-semibold text-white">{title}</h2>
-            <button onClick={onClose} className="text-white/40 hover:text-white/80 transition-colors">
-              <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-              </svg>
-            </button>
+      {/* Backdrop */}
+      <div
+        className="absolute inset-0 bg-bg/85 backdrop-blur-sm animate-fade-in"
+        onClick={onClose}
+      />
+
+      {/* Panel */}
+      <div className="relative w-full max-w-md animate-fade-up" role="dialog" aria-modal="true" aria-label={title}>
+        <div className="rounded-lg border border-border bg-s0 shadow-modal overflow-hidden">
+          {/* Header */}
+          {title && (
+            <header className="flex items-center justify-between border-b border-border px-5 py-3.5">
+              <h2 className="font-display text-sm font-bold tracking-tight text-t1">{title}</h2>
+              <button
+                onClick={onClose}
+                className="flex h-6 w-6 items-center justify-center rounded text-t3 transition-colors hover:bg-s1 hover:text-t1"
+                aria-label="Close"
+              >
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                  <path d="M18 6L6 18M6 6l12 12" />
+                </svg>
+              </button>
+            </header>
+          )}
+
+          {/* Body */}
+          <div className="p-5">
+            {children}
           </div>
-        )}
-        <div className="p-6">{children}</div>
+        </div>
       </div>
     </div>
   )

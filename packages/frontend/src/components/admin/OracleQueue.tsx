@@ -4,7 +4,6 @@ import { Button } from '../ui/Button.js'
 import { Spinner } from '../ui/Spinner.js'
 import { useUiStore } from '../../stores/uiStore.js'
 import { api } from '../../lib/api.js'
-import { formatSbtc } from '../../lib/formatters.js'
 import type { Market } from '../../lib/types.js'
 
 const ADMIN_KEY = import.meta.env.VITE_ADMIN_API_KEY || ''
@@ -17,6 +16,13 @@ interface OracleQueueItem {
   reasoning?: string
 }
 
+const STATUS_MAP: Record<string, { variant: 'gray' | 'orange' | 'red' | 'green'; label: string }> = {
+  pending:   { variant: 'gray', label: 'PENDING' },
+  submitted: { variant: 'orange', label: 'SUBMITTED' },
+  disputed:  { variant: 'red', label: 'DISPUTED' },
+  finalized: { variant: 'green', label: 'FINALIZED' },
+}
+
 export function OracleQueue() {
   const qc = useQueryClient()
   const { addToast } = useUiStore()
@@ -27,101 +33,71 @@ export function OracleQueue() {
     refetchInterval: 30000,
   })
 
-  const runOracleMutation = useMutation({
-    mutationFn: (marketId: number) => api.admin.runOracle(marketId, ADMIN_KEY),
+  const runMut = useMutation({
+    mutationFn: (id: number) => api.admin.runOracle(id, ADMIN_KEY),
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ['admin', 'oracle-queue'] })
-      addToast({ type: 'success', message: 'Oracle agent triggered — check back in ~30s' })
+      addToast({ type: 'success', message: 'Oracle triggered' })
     },
-    onError: (err: Error) => addToast({ type: 'error', message: err.message }),
+    onError: (e: Error) => addToast({ type: 'error', message: e.message }),
   })
 
-  const finalizeMutation = useMutation({
-    mutationFn: (marketId: number) => api.admin.finalizeOracle(marketId, ADMIN_KEY),
+  const finMut = useMutation({
+    mutationFn: (id: number) => api.admin.finalizeOracle(id, ADMIN_KEY),
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ['admin', 'oracle-queue'] })
-      addToast({ type: 'success', message: 'Resolution finalized on-chain' })
+      addToast({ type: 'success', message: 'Finalized on-chain' })
     },
-    onError: (err: Error) => addToast({ type: 'error', message: err.message }),
+    onError: (e: Error) => addToast({ type: 'error', message: e.message }),
   })
 
-  if (isLoading) {
-    return (
-      <div className="flex items-center justify-center py-12">
-        <Spinner />
-      </div>
-    )
-  }
+  if (isLoading) return <div className="flex justify-center py-12"><Spinner /></div>
 
   if (queue.length === 0) {
     return (
-      <div className="rounded-2xl border border-white/8 bg-surface p-8 text-center">
-        <p className="text-white/40">No markets pending oracle resolution</p>
-        <p className="mt-1 text-xs text-white/20">Oracle runs every hour automatically</p>
+      <div className="rounded-lg border border-border bg-s0 p-8 text-center">
+        <p className="font-mono text-xs text-t3">No pending resolutions</p>
+        <p className="mt-1 font-mono text-[10px] text-t4">Oracle runs automatically every hour</p>
       </div>
     )
   }
 
   return (
-    <div className="space-y-3">
-      {queue.map(({ market, status, confidence, outcome, reasoning }) => (
-        <div key={market.id} className="rounded-2xl border border-white/8 bg-surface p-5">
-          <div className="flex items-start justify-between gap-4">
-            <div className="min-w-0 flex-1">
-              <div className="flex items-center gap-2 mb-1">
-                <StatusBadge status={status} />
-                {confidence !== undefined && (
-                  <span className="text-xs text-white/40">
-                    {(confidence / 100).toFixed(0)}% confidence
-                  </span>
-                )}
+    <div className="space-y-2 stagger">
+      {queue.map(({ market, status, confidence, outcome, reasoning }) => {
+        const s = STATUS_MAP[status] ?? STATUS_MAP.pending
+        return (
+          <div key={market.id} className="row-item rounded-lg border border-border bg-s0 p-4">
+            <div className="flex items-start justify-between gap-4">
+              <div className="min-w-0 flex-1">
+                <div className="flex items-center gap-2 mb-1">
+                  <Badge variant={s.variant} dot>{s.label}</Badge>
+                  {confidence !== undefined && (
+                    <span className="font-mono text-[10px] text-t3">{(confidence / 100).toFixed(0)}% conf</span>
+                  )}
+                </div>
+                <p className="font-display text-sm font-semibold text-t1 clamp-1">{market.question}</p>
+                {reasoning && <p className="mt-1 font-mono text-[10px] text-t4 clamp-2">{reasoning}</p>}
               </div>
-              <p className="text-sm font-medium text-white truncate">{market.question}</p>
-              {reasoning && (
-                <p className="mt-1 text-xs text-white/40 line-clamp-2">{reasoning}</p>
+              {outcome !== undefined && (
+                <Badge variant={outcome ? 'green' : 'red'}>{outcome ? 'YES' : 'NO'}</Badge>
               )}
             </div>
-            {outcome !== undefined && (
-              <Badge variant={outcome ? 'green' : 'red'}>
-                {outcome ? 'YES' : 'NO'}
-              </Badge>
-            )}
+            <div className="mt-3 flex gap-2">
+              {status === 'pending' && (
+                <Button variant="secondary" size="sm" onClick={() => runMut.mutate(market.id)} loading={runMut.isPending}>
+                  RUN ORACLE
+                </Button>
+              )}
+              {status === 'submitted' && (
+                <Button size="sm" onClick={() => finMut.mutate(market.id)} loading={finMut.isPending}>
+                  FINALIZE
+                </Button>
+              )}
+            </div>
           </div>
-
-          <div className="mt-3 flex gap-2">
-            {status === 'pending' && (
-              <Button
-                variant="secondary"
-                size="sm"
-                onClick={() => runOracleMutation.mutate(market.id)}
-                loading={runOracleMutation.isPending}
-              >
-                Run Oracle Agent
-              </Button>
-            )}
-            {status === 'submitted' && (
-              <Button
-                size="sm"
-                onClick={() => finalizeMutation.mutate(market.id)}
-                loading={finalizeMutation.isPending}
-              >
-                Finalize On-Chain
-              </Button>
-            )}
-          </div>
-        </div>
-      ))}
+        )
+      })}
     </div>
   )
-}
-
-function StatusBadge({ status }: { status: string }) {
-  const map: Record<string, { variant: 'gray' | 'orange' | 'red' | 'green' | 'blue'; label: string }> = {
-    pending: { variant: 'gray', label: 'Pending' },
-    submitted: { variant: 'orange', label: 'Resolution Submitted' },
-    disputed: { variant: 'red', label: 'Disputed' },
-    finalized: { variant: 'green', label: 'Finalized' },
-  }
-  const { variant, label } = map[status] ?? { variant: 'gray', label: status }
-  return <Badge variant={variant}>{label}</Badge>
 }

@@ -1,32 +1,38 @@
 import { clsx } from 'clsx'
 import { CATEGORY_LABELS } from '../../lib/formatters.js'
-import type { MarketCategory } from '../../lib/types.js'
 
 interface MarketFiltersProps {
-  selected: MarketCategory | ''
-  onSelect: (cat: MarketCategory | '') => void
+  selected: number | null
+  onSelect: (category: number | null) => void
 }
 
-const ALL_CATEGORIES: (MarketCategory | '')[] = ['', 'crypto', 'stacks', 'macro', 'regulation', 'tech', 'global']
-const LABELS: Record<string, string> = { '': 'All', ...CATEGORY_LABELS }
-
 export function MarketFilters({ selected, onSelect }: MarketFiltersProps) {
+  const categories = [
+    { id: null, label: 'ALL' },
+    ...Object.entries(CATEGORY_LABELS).map(([id, label]) => ({
+      id: parseInt(id),
+      label: label.toUpperCase(),
+    })),
+  ]
+
   return (
-    <div className="flex flex-wrap gap-2">
-      {ALL_CATEGORIES.map((cat) => (
+    <nav className="flex items-center gap-1 overflow-x-auto pb-1 scrollbar-none" role="tablist">
+      {categories.map(({ id, label }) => (
         <button
-          key={cat || 'all'}
-          onClick={() => onSelect(cat)}
+          key={label}
+          role="tab"
+          aria-selected={selected === id}
+          onClick={() => onSelect(id)}
           className={clsx(
-            'rounded-full px-3 py-1.5 text-xs font-medium transition-all',
-            selected === cat
-              ? 'bg-orange-500 text-white'
-              : 'border border-white/10 bg-surface text-white/60 hover:border-orange-500/30 hover:text-white'
+            'whitespace-nowrap rounded px-3 py-1.5 font-mono text-[10px] font-medium tracking-wider transition-all duration-150 border',
+            selected === id
+              ? 'border-orange/30 bg-orange/10 text-orange'
+              : 'border-transparent text-t3 hover:text-t1 hover:bg-s1'
           )}
         >
-          {LABELS[cat] ?? cat}
+          {label}
         </button>
       ))}
-    </div>
+    </nav>
   )
 }

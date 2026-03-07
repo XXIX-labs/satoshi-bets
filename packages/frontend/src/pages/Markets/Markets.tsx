@@ -3,81 +3,76 @@ import { useMarkets } from '../../hooks/useMarkets.js'
 import { MarketCard } from '../../components/markets/MarketCard.js'
 import { MarketFilters } from '../../components/markets/MarketFilters.js'
 import { Spinner } from '../../components/ui/Spinner.js'
+import { Skeleton } from '../../components/ui/Spinner.js'
 
 type SortOption = 'volume' | 'newest' | 'expiring'
 
 export function Markets() {
   const [category, setCategory] = useState<number | null>(null)
   const [sort, setSort] = useState<SortOption>('volume')
-
   const { data: markets = [], isLoading, isError } = useMarkets({ category, sort })
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-5">
       {/* Header */}
-      <div>
-        <h1 className="text-3xl font-bold text-white">Markets</h1>
-        <p className="mt-1 text-sm text-white/40">
-          AI-generated binary prediction markets. Trade YES/NO with sBTC.
+      <header className="animate-fade-up">
+        <h1 className="font-display text-2xl font-extrabold tracking-tight text-t1 sm:text-3xl">
+          MARKETS
+        </h1>
+        <p className="mt-1 font-mono text-xs text-t3">
+          Binary prediction markets · sBTC collateral · Bitcoin settlement
         </p>
-      </div>
+      </header>
 
-      {/* Filters + Sort */}
-      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+      {/* Controls */}
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between animate-fade-up" style={{ animationDelay: '0.05s' }}>
         <MarketFilters selected={category} onSelect={setCategory} />
-        <SortPicker value={sort} onChange={setSort} />
+        <select
+          value={sort}
+          onChange={(e) => setSort(e.target.value as SortOption)}
+          className="rounded-md border border-border bg-s0 px-3 py-1.5 font-mono text-[11px] text-t2 focus:border-orange/50 focus:outline-none"
+        >
+          <option value="volume">MOST VOLUME</option>
+          <option value="newest">NEWEST</option>
+          <option value="expiring">EXPIRING SOON</option>
+        </select>
       </div>
 
-      {/* Content */}
+      {/* Loading skeletons */}
       {isLoading && (
-        <div className="flex justify-center py-16">
-          <Spinner />
+        <div className="space-y-2">
+          {Array.from({ length: 5 }).map((_, i) => (
+            <Skeleton key={i} className="h-20 rounded-lg" />
+          ))}
         </div>
       )}
 
+      {/* Error */}
       {isError && (
-        <div className="rounded-2xl border border-red-500/20 bg-red-500/5 p-8 text-center">
-          <p className="text-red-400">Failed to load markets</p>
-          <p className="mt-1 text-xs text-white/30">Check API connection and try again</p>
+        <div className="rounded-lg border border-no/20 bg-no/5 p-6 text-center">
+          <p className="font-mono text-xs text-no">FAILED TO LOAD MARKETS</p>
+          <p className="mt-1 font-mono text-[10px] text-t4">Check API connection</p>
         </div>
       )}
 
+      {/* Empty state */}
       {!isLoading && !isError && markets.length === 0 && (
-        <div className="rounded-2xl border border-white/8 bg-surface p-12 text-center">
-          <p className="text-white/40">No markets found</p>
-          <p className="mt-1 text-xs text-white/20">
-            {category ? 'Try a different category' : 'Markets are generated every 4 hours'}
+        <div className="rounded-lg border border-border bg-s0 p-12 text-center">
+          <p className="font-mono text-xs text-t3">NO MARKETS FOUND</p>
+          <p className="mt-1 font-mono text-[10px] text-t4">
+            {category ? 'Try a different category' : 'Markets generate every 4h'}
           </p>
         </div>
       )}
 
+      {/* Market feed — dense list, not a card grid */}
       {!isLoading && !isError && markets.length > 0 && (
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="space-y-1.5 stagger">
           {markets.map((market) => (
             <MarketCard key={market.id} market={market} />
           ))}
         </div>
       )}
     </div>
-  )
-}
-
-function SortPicker({ value, onChange }: { value: SortOption; onChange: (v: SortOption) => void }) {
-  const options: { value: SortOption; label: string }[] = [
-    { value: 'volume', label: 'Most Volume' },
-    { value: 'newest', label: 'Newest' },
-    { value: 'expiring', label: 'Expiring Soon' },
-  ]
-
-  return (
-    <select
-      value={value}
-      onChange={(e) => onChange(e.target.value as SortOption)}
-      className="rounded-xl border border-white/10 bg-surface px-3 py-2 text-sm text-white/70 focus:border-orange-500/50 focus:outline-none"
-    >
-      {options.map((opt) => (
-        <option key={opt.value} value={opt.value}>{opt.label}</option>
-      ))}
-    </select>
   )
 }
