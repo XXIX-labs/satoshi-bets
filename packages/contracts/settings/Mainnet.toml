@@ -1,0 +1,7 @@
+[network]
+name = "mainnet"
+stacks-node = "https://api.hiro.so"
+
+[accounts.deployer]
+# Set DEPLOYER_MNEMONIC environment variable — NEVER commit mnemonic to git
+mnemonic = ""
