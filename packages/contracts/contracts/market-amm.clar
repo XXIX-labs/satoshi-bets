@@ -33,6 +33,8 @@
 (define-constant PRECISION u1000000)
 ;; Minimum pool size: 0.01 sBTC to prevent division by zero
 (define-constant MIN-POOL-SIZE u1000000)
+;; Minimum fee floor to prevent zero-fee micro trades
+(define-constant MIN-FEE u1)
 
 ;; ============================================================
 ;; DATA VARS
@@ -313,12 +315,12 @@
     (shares-in uint)
     (min-amount-out uint)
     (sbtc-contract <sip010-trait>))
-  (begin
+  (let ((trader tx-sender))
     (asserts! (> shares-in u0) ERR-ZERO-AMOUNT)
     (let (
         (pool (unwrap! (map-get? pools market-id) ERR-POOL-NOT-FOUND))
         (position (unwrap!
-          (map-get? positions { market-id: market-id, trader: tx-sender })
+          (map-get? positions { market-id: market-id, trader: trader })
           ERR-NOT-FOUND))
         (yes (get yes-pool pool))
         (no (get no-pool pool))
@@ -338,15 +340,15 @@
         no-pool: new-no,
         total-fees: (+ (get total-fees pool) fee)
       }))
-      (map-set positions { market-id: market-id, trader: tx-sender }
+      (map-set positions { market-id: market-id, trader: trader }
         (merge position {
           yes-shares: (- (get yes-shares position) shares-in)
         })
       )
-      ;; Send payout and fee from contract
+      ;; Send payout to trader, fee to recipient
       (as-contract
         (try! (contract-call? sbtc-contract transfer
-          amount-out tx-sender tx-sender none)))
+          amount-out tx-sender trader none)))
       (as-contract
         (try! (contract-call? sbtc-contract transfer
           fee tx-sender (var-get fee-recipient) none)))
@@ -360,12 +362,12 @@
     (shares-in uint)
     (min-amount-out uint)
     (sbtc-contract <sip010-trait>))
-  (begin
+  (let ((trader tx-sender))
     (asserts! (> shares-in u0) ERR-ZERO-AMOUNT)
     (let (
         (pool (unwrap! (map-get? pools market-id) ERR-POOL-NOT-FOUND))
         (position (unwrap!
-          (map-get? positions { market-id: market-id, trader: tx-sender })
+          (map-get? positions { market-id: market-id, trader: trader })
           ERR-NOT-FOUND))
         (yes (get yes-pool pool))
         (no (get no-pool pool))
@@ -385,14 +387,14 @@
         no-pool: new-no,
         total-fees: (+ (get total-fees pool) fee)
       }))
-      (map-set positions { market-id: market-id, trader: tx-sender }
+      (map-set positions { market-id: market-id, trader: trader }
         (merge position {
           no-shares: (- (get no-shares position) shares-in)
         })
       )
       (as-contract
         (try! (contract-call? sbtc-contract transfer
-          amount-out tx-sender tx-sender none)))
+          amount-out tx-sender trader none)))
       (as-contract
         (try! (contract-call? sbtc-contract transfer
           fee tx-sender (var-get fee-recipient) none)))
@@ -405,6 +407,7 @@
     (market-id uint)
     (sbtc-contract <sip010-trait>))
   (let (
+      (trader tx-sender)
       (pool (unwrap! (map-get? pools market-id) ERR-POOL-NOT-FOUND))
       (position (unwrap!
         (map-get? positions { market-id: market-id, trader: tx-sender })
@@ -430,12 +433,13 @@
       ;; Must have winning shares
       (asserts! (> winning-shares u0) ERR-WRONG-OUTCOME)
       ;; Mark claimed before transfer (checks-effects-interactions)
-      (map-set positions { market-id: market-id, trader: tx-sender }
+      (map-set positions { market-id: market-id, trader: trader }
         (merge position { claimed: true })
       )
+      ;; Send winnings to trader, fee to protocol
       (as-contract
         (try! (contract-call? sbtc-contract transfer
-          winnings tx-sender tx-sender none)))
+          winnings tx-sender trader none)))
       (as-contract
         (try! (contract-call? sbtc-contract transfer
           fee tx-sender (var-get fee-recipient) none)))

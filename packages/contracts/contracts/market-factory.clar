@@ -144,10 +144,11 @@
   )
 )
 
-;; Called internally by oracle-registry.clar after finalization
+;; Emergency admin override — allows admin to resolve directly (bypasses oracle)
+;; Normal resolution path goes through oracle-registry → market-amm.resolve
+;; This function is the admin circuit breaker for emergencies
 (define-public (resolve-market (market-id uint) (outcome bool))
   (begin
-    ;; Only the oracle-registry contract (deployed at same address) can call this
     (asserts! (is-admin) ERR-UNAUTHORIZED)
     (let ((market (unwrap! (map-get? markets market-id) ERR-NOT-FOUND)))
       (asserts! (is-eq (get status market) STATUS-ACTIVE) ERR-ALREADY-RESOLVED)
