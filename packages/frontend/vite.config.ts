@@ -13,7 +13,7 @@ export default defineConfig({
     },
   },
   build: {
-    outDir: 'dist',
+    outDir: process.env.VERCEL ? '../../dist' : 'dist',
     sourcemap: true,
   },
 })

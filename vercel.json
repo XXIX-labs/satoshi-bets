@@ -3,5 +3,5 @@
   "framework": null,
   "installCommand": "corepack enable && pnpm install",
   "buildCommand": "pnpm --filter @satoshi-bets/frontend build",
-  "outputDirectory": "packages/frontend/dist"
+  "outputDirectory": "dist"
 }
